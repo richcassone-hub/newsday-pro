@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Newsday Pro v1.23</title>
+<title>Newsday Pro v1.25</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect x=%272%27 y=%272%27 width=%2760%27 height=%2760%27 rx=%2714%27 fill=%27%23132033%27 stroke=%27%2336506f%27 stroke-width=%274%27/%3E%3Crect x=%2714%27 y=%2715%27 width=%2736%27 height=%275%27 rx=%272.5%27 fill=%27%234ea1ff%27/%3E%3Crect x=%2714%27 y=%2729%27 width=%2736%27 height=%275%27 rx=%272.5%27 fill=%27%23d7e4f3%27/%3E%3Crect x=%2714%27 y=%2743%27 width=%2728%27 height=%275%27 rx=%272.5%27 fill=%27%238193a7%27/%3E%3Ccircle cx=%2751%27 cy=%2749%27 r=%275%27 fill=%27%23ff6670%27/%3E%3C/svg%3E">
 <style>
 :root{
@@ -154,7 +154,7 @@ label{display:block;font-size:calc(var(--content-size) * .72);color:var(--muted)
 <body>
 <div class="app">
 <header class="topbar">
-  <div class="brand"><span class="logo"></span><strong>Newsday Pro <span class="version">v1.23</span></strong></div>
+  <div class="brand"><span class="logo"></span><strong>Newsday Pro <span class="version">v1.25</span></strong></div>
   <input id="newsdayName" class="newsday-name" aria-label="Newsday name">
   <button id="newBtn">New</button><button id="saveBtn" class="primary">Save</button><button id="saveAsBtn">Save As</button>
   <button id="loadBtn">Load</button><button id="exportBtn">Export</button><button id="importBtn">Import</button>
@@ -184,7 +184,7 @@ label{display:block;font-size:calc(var(--content-size) * .72);color:var(--muted)
   <div class="modal" style="width:min(430px,92vw)">
     <div class="row"><h3 style="flex:1">About Newsday</h3><button id="closeAbout">Close</button></div>
     <div style="line-height:1.55">
-      <p><strong>Newsday Pro</strong><br>Version 1.23</p>
+      <p><strong>Newsday Pro</strong><br>Version 1.25</p>
       <p>A browser-based news writing, audio playback, and newscast assembly tool.</p>
       <p>Created by Rich Cassone<br>Built with ChatGPT</p>
       <p>© 2026</p>
@@ -465,6 +465,13 @@ function library(){try{return JSON.parse(localStorage.getItem(LIB)||"{}")}catch{
 function saveLibrary(map){localStorage.setItem(LIB,JSON.stringify(map))}
 function toast(msg){$("toast").textContent=msg;$("toast").classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>$("toast").classList.remove("show"),1400)}
 function autoHeight(t){t.style.height="auto";t.style.height=Math.max(72,t.scrollHeight+2)+"px"}
+// Keep DOM/layout side effects out of Chrome's active text-edit transaction so native undo/redo can group typing normally.
+const nativeEditFrames=new WeakMap();
+function afterNativeEdit(el,fn){
+ const prior=nativeEditFrames.get(el);if(prior)cancelAnimationFrame(prior);
+ const frame=requestAnimationFrame(()=>{nativeEditFrames.delete(el);fn()});
+ nativeEditFrames.set(el,frame);
+}
 function setFont(n){state.fontSize=clamp(n,11,28);document.documentElement.style.setProperty("--story-size",state.fontSize+"px");document.documentElement.style.setProperty("--content-size",state.fontSize+"px");document.documentElement.style.setProperty("--content-size",state.fontSize+"px");saveCurrent()}
 function safeUrl(v){v=String(v||"").trim();if(!v)return null;try{let u=new URL(/^[a-z]+:/i.test(v)?v:"https://"+v);return /^https?:$/.test(u.protocol)?u.href:null}catch{return null}}
 
@@ -658,7 +665,7 @@ function moveItemToTop(list,id){
  const i=list.findIndex(x=>x.id===id);if(i<0)return;
  const [item]=list.splice(i,1);list.unshift(item);
 }
-function completeArticle(a){
+function killArticle(a){
  a.completed=true;a.locked=true;a.collapsed=true;a.pinned=false;moveItemToEnd(state.articles,a.id);render();
 }
 function restoreArticle(a){
@@ -695,11 +702,12 @@ function renderArticles(){
  let stack=$("articleStack");stack.innerHTML="";
  if(!state.articles.length){stack.innerHTML='<div class="empty">No articles yet.</div>';return}
  const active=[...state.articles.filter(a=>a.pinned&&!a.completed),...state.articles.filter(a=>!a.pinned&&!a.completed)];
+ const ordered=[...active,...state.articles.filter(a=>a.completed)];
  const label=document.createElement("div");label.className="pin-section-label";label.textContent="Pinned";stack.appendChild(label);
  if(!active.some(a=>a.pinned)){const dz=document.createElement("div");dz.className="pin-drop-empty";dz.dataset.pinDrop="empty";dz.textContent="Drag articles here to pin";stack.appendChild(dz)}
  let dividerInserted=false;
- active.forEach((a)=>{
-  if(!a.pinned&&!dividerInserted){const div=document.createElement("div");div.className="pin-divider";div.dataset.pinDivider="true";stack.appendChild(div);dividerInserted=true}
+ ordered.forEach((a)=>{
+  if(!a.completed&&!a.pinned&&!dividerInserted){const div=document.createElement("div");div.className="pin-divider";div.dataset.pinDivider="true";stack.appendChild(div);dividerInserted=true}
   let c=document.createElement("article");c.className="card "+(a.collapsed?"collapsed ":"")+(a.locked?"locked ":"")+(a.completed?"completed":"");c.dataset.articleId=a.id;
   let head=document.createElement("div");head.className="card-head";
   let h=makeHandle("article",a.id),title=document.createElement("div");title.className="title"+(a.audio?.length?" has-audio":"");title.textContent=a.title;
@@ -717,11 +725,11 @@ function renderArticles(){
   ti.value=a.title;ui.value=a.url;ta.value=a.text;st.textContent=stats(a.text,a.audio);
   ti.disabled=a.locked;ui.disabled=a.locked;ta.disabled=a.locked;
   const updateOpen=()=>open.disabled=!safeUrl(ui.value);updateOpen();
-  ti.oninput=()=>{a.title=ti.value||"Untitled Article";title.textContent=a.title;saveCurrent()};
+  ti.oninput=()=>{a.title=ti.value||"Untitled Article";afterNativeEdit(ti,()=>{title.textContent=a.title;saveCurrent()})};
   ti.onblur=()=>{a.title=ti.value.trim()||"Untitled Article";ti.value=a.title;title.textContent=a.title;saveCurrent()};
-  ui.oninput=()=>{a.url=ui.value;updateOpen();saveCurrent()};
+  ui.oninput=()=>{a.url=ui.value;afterNativeEdit(ui,()=>{updateOpen();saveCurrent()})};
   open.onclick=()=>{let u=safeUrl(ui.value);if(u)window.open(u,"_blank","noopener")};
-  ta.oninput=()=>{a.text=ta.value;st.textContent=stats(a.text,a.audio);m.textContent=combinedTime(a.text,a.audio);autoHeight(ta);saveCurrent()};
+  ta.oninput=()=>{a.text=ta.value;afterNativeEdit(ta,()=>{st.textContent=stats(a.text,a.audio);m.textContent=combinedTime(a.text,a.audio);autoHeight(ta);saveCurrent()})};
   if(!a.collapsed)requestAnimationFrame(()=>autoHeight(ta));
 
   const audioSection=document.createElement("div");audioSection.className="audio-section";
@@ -738,8 +746,8 @@ function renderArticles(){
   a.audio.forEach(clip=>audioList.appendChild(makeAudioTile(clip,a.audio,{editable:!a.locked,onChange:()=>{st.textContent=stats(a.text,a.audio);m.textContent=combinedTime(a.text,a.audio);audioTitle.textContent=`Audio (${a.audio.length})`;saveCurrent()}})));
   audioSection.appendChild(audioList);body.insertBefore(audioSection,body.querySelector(".bottom-row"));
 
-  complete.textContent=a.completed?"Restore":"Complete";
-  complete.onclick=()=>a.completed?restoreArticle(a):completeArticle(a);
+  complete.textContent=a.completed?"Restore":"Kill";
+  complete.onclick=()=>a.completed?restoreArticle(a):killArticle(a);
 
   c.append(head,body);stack.appendChild(c);
  });
@@ -815,7 +823,7 @@ function renderCasts(){
     let lab=document.createElement("label");lab.textContent="Newscast name";
     let inp=document.createElement("input");inp.value=nc.name;
     const original=nc.name;
-    inp.oninput=()=>{nc.name=inp.value;name.textContent=inp.value||"Newscast";saveCurrent()};
+    inp.oninput=()=>{nc.name=inp.value;afterNativeEdit(inp,()=>{name.textContent=nc.name||"Newscast";saveCurrent()})};
     inp.onkeydown=e=>{
       if(e.key==="Enter"){e.preventDefault();nc.name=inp.value.trim()||"Newscast";nc.editing=false;render()}
       else if(e.key==="Escape"){e.preventDefault();nc.name=original;nc.editing=false;render()}
@@ -833,7 +841,7 @@ function renderCasts(){
     ih.append(hh,tt,im,eb,db);
     let ib=document.createElement("div");ib.className="cast-item-body";
     if(it.editing&&!nc.locked){
-      let ta=document.createElement("textarea");ta.value=it.text;ta.oninput=()=>{it.text=ta.value;im.textContent=combinedTime(it.text,it.audio);updateMeta();total.textContent=totalText(nc);autoHeight(ta);saveCurrent()};ib.appendChild(ta);requestAnimationFrame(()=>autoHeight(ta));
+      let ta=document.createElement("textarea");ta.value=it.text;ta.oninput=()=>{it.text=ta.value;afterNativeEdit(ta,()=>{im.textContent=combinedTime(it.text,it.audio);updateMeta();total.textContent=totalText(nc);autoHeight(ta);saveCurrent()})};ib.appendChild(ta);requestAnimationFrame(()=>autoHeight(ta));
     }else{
       let rd=document.createElement("div");rd.className="readonly-text"+(it.text.trim()?"":" empty");rd.textContent=it.text||"(No text)";ib.appendChild(rd);
     }
@@ -858,7 +866,7 @@ function renderCasts(){
 
   let l=document.createElement("label");l.textContent="Lockout";body.appendChild(l);
   if(nc.editing&&!nc.locked){
-    let ta=document.createElement("textarea");ta.value=nc.lockout;ta.oninput=()=>{nc.lockout=ta.value;updateMeta();total.textContent=totalText(nc);autoHeight(ta);saveCurrent()};body.appendChild(ta);requestAnimationFrame(()=>autoHeight(ta))
+    let ta=document.createElement("textarea");ta.value=nc.lockout;ta.oninput=()=>{nc.lockout=ta.value;afterNativeEdit(ta,()=>{updateMeta();total.textContent=totalText(nc);autoHeight(ta);saveCurrent()})};body.appendChild(ta);requestAnimationFrame(()=>autoHeight(ta))
   }else{
     let rd=document.createElement("div");rd.className="lockout-read readonly-text"+(nc.lockout.trim()?"":" empty");rd.textContent=nc.lockout||"(No lockout)";body.appendChild(rd)
   }
@@ -996,7 +1004,7 @@ $("collapseAll").onclick=()=>{state.articles.forEach(a=>a.collapsed=true);render
 $("expandAll").onclick=()=>{state.articles.forEach(a=>a.collapsed=false);render()};
 $("fontMinus").onclick=()=>setFont(state.fontSize-1);
 $("fontPlus").onclick=()=>setFont(state.fontSize+1);
-$("newsdayName").oninput=e=>{state.name=e.target.value;saveCurrent()};
+$("newsdayName").oninput=e=>{state.name=e.target.value;afterNativeEdit(e.target,saveCurrent)};
 $("newsdayName").onblur=e=>{state.name=e.target.value.trim()||today();e.target.value=state.name;saveCurrent()};
 $("wpm").onchange=e=>{state.wpm=clamp(+e.target.value||180,30,800);render()};
 $("newBtn").onclick=()=>{if(confirm("Create a new Newsday? Unsaved current work will be replaced.")){state=newState();setFont(16);render()}};
