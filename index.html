@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Newsday Pro v1.25</title>
+<title>Newsday Pro v1.26</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect x=%272%27 y=%272%27 width=%2760%27 height=%2760%27 rx=%2714%27 fill=%27%23132033%27 stroke=%27%2336506f%27 stroke-width=%274%27/%3E%3Crect x=%2714%27 y=%2715%27 width=%2736%27 height=%275%27 rx=%272.5%27 fill=%27%234ea1ff%27/%3E%3Crect x=%2714%27 y=%2729%27 width=%2736%27 height=%275%27 rx=%272.5%27 fill=%27%23d7e4f3%27/%3E%3Crect x=%2714%27 y=%2743%27 width=%2728%27 height=%275%27 rx=%272.5%27 fill=%27%238193a7%27/%3E%3Ccircle cx=%2751%27 cy=%2749%27 r=%275%27 fill=%27%23ff6670%27/%3E%3C/svg%3E">
 <style>
 :root{
@@ -154,7 +154,7 @@ label{display:block;font-size:calc(var(--content-size) * .72);color:var(--muted)
 <body>
 <div class="app">
 <header class="topbar">
-  <div class="brand"><span class="logo"></span><strong>Newsday Pro <span class="version">v1.25</span></strong></div>
+  <div class="brand"><span class="logo"></span><strong>Newsday Pro <span class="version">v1.26</span></strong></div>
   <input id="newsdayName" class="newsday-name" aria-label="Newsday name">
   <button id="newBtn">New</button><button id="saveBtn" class="primary">Save</button><button id="saveAsBtn">Save As</button>
   <button id="loadBtn">Load</button><button id="exportBtn">Export</button><button id="importBtn">Import</button>
@@ -184,7 +184,7 @@ label{display:block;font-size:calc(var(--content-size) * .72);color:var(--muted)
   <div class="modal" style="width:min(430px,92vw)">
     <div class="row"><h3 style="flex:1">About Newsday</h3><button id="closeAbout">Close</button></div>
     <div style="line-height:1.55">
-      <p><strong>Newsday Pro</strong><br>Version 1.25</p>
+      <p><strong>Newsday Pro</strong><br>Version 1.26</p>
       <p>A browser-based news writing, audio playback, and newscast assembly tool.</p>
       <p>Created by Rich Cassone<br>Built with ChatGPT</p>
       <p>© 2026</p>
@@ -510,8 +510,8 @@ function render(){
 function makeHandle(type,id,parentId=null){
  let h=document.createElement("div");h.className="handle";h.textContent="⋮⋮";h.title="Drag";
  const article=type==="article"?state.articles.find(a=>a.id===id):null;
- const blocked=(type==="cast-item"&&state.newscasts.find(n=>n.id===parentId)?.locked)||(type==="article"&&article?.completed);
- if(blocked){h.style.opacity=".35";h.style.cursor="default";h.title=type==="article"?"Article completed":"Newscast locked";}
+ const blocked=(type==="cast-item"&&state.newscasts.find(n=>n.id===parentId)?.locked);
+ if(blocked){h.style.opacity=".35";h.style.cursor="default";h.title="Newscast locked";}
  h.addEventListener("click",e=>e.stopPropagation());
  h.addEventListener("pointerdown",e=>{if(!blocked)beginPointerDrag(e,type,id,parentId,h.closest(".card,.cast-item"))});
  return h;
@@ -563,7 +563,7 @@ function pointerDragMove(e){
    const stack=el.closest("#articleStack");if(stack){placeArticlePlaceholderBySection(stack,e.clientY);drag.targetType="article";drag.targetParentId=null;return}
  }
  if(drag.type==="newscast"){
-   const stack=el.closest("#castStack");if(stack){placePlaceholder(stack,e.clientY,"[data-cast-id]");drag.targetType="newscast";drag.targetParentId=null;return}
+   const stack=el.closest("#castStack");if(stack){placeNewscastPlaceholderBySection(stack,e.clientY);drag.targetType="newscast";drag.targetParentId=null;return}
  }
  if(drag.type==="cast-item"){
    const castItems=el.closest(".cast-items");const cast=castItems?.closest("[data-cast-id]");
@@ -583,8 +583,38 @@ function placePlaceholder(container,y,selector){
    container.insertBefore(drag.placeholder,before);
  }
 }
+function placeNewscastPlaceholderBySection(stack,y){
+ const cards=[...stack.querySelectorAll("[data-cast-id]")].filter(x=>x!==drag.sourceEl&&x.style.display!=="none");
+ const dragged=state.newscasts.find(x=>x.id===drag.id);
+ const targetCompleted=!!dragged?.completed;
+ const candidates=cards.filter(c=>!!state.newscasts.find(x=>x.id===c.dataset.castId)?.completed===targetCompleted);
+ let before=null;
+ for(const item of candidates){const r=item.getBoundingClientRect();if(y<r.top+r.height/2){before=item;break}}
+ if(targetCompleted){
+   if(before)stack.insertBefore(drag.placeholder,before);
+   else stack.appendChild(drag.placeholder);
+ }else{
+   const completedHeader=stack.querySelector("[data-completed-cast-header='true']");
+   if(before)stack.insertBefore(drag.placeholder,before);
+   else if(completedHeader)stack.insertBefore(drag.placeholder,completedHeader);
+   else stack.appendChild(drag.placeholder);
+ }
+ drag.targetCompleted=targetCompleted;
+}
 function placeArticlePlaceholderBySection(stack,y){
  const cards=[...stack.querySelectorAll("[data-article-id]")].filter(x=>x!==drag.sourceEl&&x.style.display!=="none");
+ const draggedArticle=state.articles.find(x=>x.id===drag.id);
+ if(draggedArticle?.completed){
+   const completedCards=cards.filter(c=>state.articles.find(x=>x.id===c.dataset.articleId)?.completed);
+   let before=null;
+   for(const item of completedCards){const r=item.getBoundingClientRect();if(y<r.top+r.height/2){before=item;break}}
+   if(before)stack.insertBefore(drag.placeholder,before);
+   else stack.appendChild(drag.placeholder);
+   drag.targetPinned=false;
+   drag.targetCompleted=true;
+   return;
+ }
+ drag.targetCompleted=false;
  const divider=stack.querySelector("[data-pin-divider='true']");
  const emptyPinned=stack.querySelector("[data-pin-drop='empty']");
  let boundary;
@@ -621,7 +651,7 @@ function finishPointerDrag(){
  if(d.targetType==="article"){
    const article=state.articles.find(x=>x.id===d.id);
    if(article){
-     article.pinned=!!d.targetPinned;
+     if(!article.completed)article.pinned=!!d.targetPinned;
      let next=d.placeholder.nextElementSibling;
      while(next&&!next.dataset?.articleId)next=next.nextElementSibling;
      beforeId=next?.dataset.articleId||null;
@@ -705,9 +735,10 @@ function renderArticles(){
  const ordered=[...active,...state.articles.filter(a=>a.completed)];
  const label=document.createElement("div");label.className="pin-section-label";label.textContent="Pinned";stack.appendChild(label);
  if(!active.some(a=>a.pinned)){const dz=document.createElement("div");dz.className="pin-drop-empty";dz.dataset.pinDrop="empty";dz.textContent="Drag articles here to pin";stack.appendChild(dz)}
- let dividerInserted=false;
+ let dividerInserted=false,killLabelInserted=false;
  ordered.forEach((a)=>{
   if(!a.completed&&!a.pinned&&!dividerInserted){const div=document.createElement("div");div.className="pin-divider";div.dataset.pinDivider="true";stack.appendChild(div);dividerInserted=true}
+  if(a.completed&&!killLabelInserted){const label=document.createElement("div");label.className="pin-section-label";label.textContent="Killed";label.dataset.killSection="true";stack.appendChild(label);killLabelInserted=true}
   let c=document.createElement("article");c.className="card "+(a.collapsed?"collapsed ":"")+(a.locked?"locked ":"")+(a.completed?"completed":"");c.dataset.articleId=a.id;
   let head=document.createElement("div");head.className="card-head";
   let h=makeHandle("article",a.id),title=document.createElement("div");title.className="title"+(a.audio?.length?" has-audio":"");title.textContent=a.title;
@@ -715,7 +746,7 @@ function renderArticles(){
   let pin=document.createElement("button");pin.className="pin-btn"+(a.pinned?" active":"");pin.textContent="📌";pin.title=a.pinned?"Unpin article":"Pin article to top";pin.setAttribute("aria-label",pin.title);pin.disabled=a.completed;pin.onclick=e=>{e.stopPropagation();if(a.completed)return;setArticlePinnedByIcon(a)};
   let send=document.createElement("button");send.className="icon send";send.title="Send to active newscast";send.textContent="→";send.disabled=!state.activeNewscastId||a.completed;send.onclick=e=>{e.stopPropagation();if(a.completed)return;let nc=state.newscasts.find(n=>n.id===state.activeNewscastId);if(!nc)return alert("Create or select a newscast first.");if(nc.locked||nc.completed)return alert("The active newscast is locked or completed.");insertArticleCopy(nc,a);render();toast(`Sent to ${nc.name}`)};
   let lock=document.createElement("button");lock.className="icon";lock.textContent=a.locked?"🔒":"🔓";lock.title=a.locked?"Unlock article":"Lock article";lock.setAttribute("aria-label",lock.title);lock.disabled=a.completed;lock.onclick=e=>{e.stopPropagation();if(a.completed)return;a.locked=!a.locked;render()};
-  let del=document.createElement("button");del.className="icon danger audio-delete";del.textContent="×";del.title="Delete";del.disabled=a.locked;del.onclick=e=>{e.stopPropagation();if(a.locked)return;if(confirm(`Delete article "${a.title}"?`)){state.articles=state.articles.filter(x=>x.id!==a.id);render()}};
+  let del=document.createElement("button");del.className="icon danger audio-delete";del.textContent="×";del.title="Delete";del.disabled=a.locked&&!a.completed;del.onclick=e=>{e.stopPropagation();if(a.locked&&!a.completed)return;if(confirm(`Delete article "${a.title}"?`)){state.articles=state.articles.filter(x=>x.id!==a.id);render()}};
   head.append(h,title,m,pin,send,lock,del);
   head.onclick=e=>{if(e.target.closest("button,.handle"))return;a.collapsed=!a.collapsed;render()};
 
@@ -781,7 +812,12 @@ function renderCasts(){
  $("castHeading").textContent=`Newscasts (${state.newscasts.length})`;
  let stack=$("castStack");stack.innerHTML="";
  if(!state.newscasts.length){stack.innerHTML='<div class="empty">No newscasts yet.</div>';return}
- state.newscasts.forEach((nc)=>{
+ const ordered=[...state.newscasts.filter(n=>!n.completed),...state.newscasts.filter(n=>n.completed)];
+ let completedHeaderInserted=false;
+ ordered.forEach((nc)=>{
+  if(nc.completed&&!completedHeaderInserted){
+    const label=document.createElement("div");label.className="pin-section-label";label.textContent="Completed";label.dataset.completedCastHeader="true";stack.appendChild(label);completedHeaderInserted=true;
+  }
   let c=document.createElement("section");c.className="card "+(nc.collapsed?"collapsed ":"")+(state.activeNewscastId===nc.id?"active ":"")+(nc.locked?"locked ":"")+(nc.completed?"completed":"");c.dataset.castId=nc.id;
   c.onclick=()=>{state.activeNewscastId=nc.id;saveCurrent();document.querySelectorAll("[data-cast-id]").forEach(x=>x.classList.toggle("active",x.dataset.castId===nc.id));document.querySelectorAll(".send").forEach(b=>b.disabled=false)};
   let head=document.createElement("div");head.className="card-head";
