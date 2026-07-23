@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Newsday Pro v1.26</title>
+<title>Newsday Pro v1.27</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect x=%272%27 y=%272%27 width=%2760%27 height=%2760%27 rx=%2714%27 fill=%27%23132033%27 stroke=%27%2336506f%27 stroke-width=%274%27/%3E%3Crect x=%2714%27 y=%2715%27 width=%2736%27 height=%275%27 rx=%272.5%27 fill=%27%234ea1ff%27/%3E%3Crect x=%2714%27 y=%2729%27 width=%2736%27 height=%275%27 rx=%272.5%27 fill=%27%23d7e4f3%27/%3E%3Crect x=%2714%27 y=%2743%27 width=%2728%27 height=%275%27 rx=%272.5%27 fill=%27%238193a7%27/%3E%3Ccircle cx=%2751%27 cy=%2749%27 r=%275%27 fill=%27%23ff6670%27/%3E%3C/svg%3E">
 <style>
 :root{
@@ -154,7 +154,7 @@ label{display:block;font-size:calc(var(--content-size) * .72);color:var(--muted)
 <body>
 <div class="app">
 <header class="topbar">
-  <div class="brand"><span class="logo"></span><strong>Newsday Pro <span class="version">v1.26</span></strong></div>
+  <div class="brand"><span class="logo"></span><strong>Newsday Pro <span class="version">v1.27</span></strong></div>
   <input id="newsdayName" class="newsday-name" aria-label="Newsday name">
   <button id="newBtn">New</button><button id="saveBtn" class="primary">Save</button><button id="saveAsBtn">Save As</button>
   <button id="loadBtn">Load</button><button id="exportBtn">Export</button><button id="importBtn">Import</button>
@@ -184,7 +184,7 @@ label{display:block;font-size:calc(var(--content-size) * .72);color:var(--muted)
   <div class="modal" style="width:min(430px,92vw)">
     <div class="row"><h3 style="flex:1">About Newsday</h3><button id="closeAbout">Close</button></div>
     <div style="line-height:1.55">
-      <p><strong>Newsday Pro</strong><br>Version 1.26</p>
+      <p><strong>Newsday Pro</strong><br>Version 1.27</p>
       <p>A browser-based news writing, audio playback, and newscast assembly tool.</p>
       <p>Created by Rich Cassone<br>Built with ChatGPT</p>
       <p>© 2026</p>
@@ -746,7 +746,7 @@ function renderArticles(){
   let pin=document.createElement("button");pin.className="pin-btn"+(a.pinned?" active":"");pin.textContent="📌";pin.title=a.pinned?"Unpin article":"Pin article to top";pin.setAttribute("aria-label",pin.title);pin.disabled=a.completed;pin.onclick=e=>{e.stopPropagation();if(a.completed)return;setArticlePinnedByIcon(a)};
   let send=document.createElement("button");send.className="icon send";send.title="Send to active newscast";send.textContent="→";send.disabled=!state.activeNewscastId||a.completed;send.onclick=e=>{e.stopPropagation();if(a.completed)return;let nc=state.newscasts.find(n=>n.id===state.activeNewscastId);if(!nc)return alert("Create or select a newscast first.");if(nc.locked||nc.completed)return alert("The active newscast is locked or completed.");insertArticleCopy(nc,a);render();toast(`Sent to ${nc.name}`)};
   let lock=document.createElement("button");lock.className="icon";lock.textContent=a.locked?"🔒":"🔓";lock.title=a.locked?"Unlock article":"Lock article";lock.setAttribute("aria-label",lock.title);lock.disabled=a.completed;lock.onclick=e=>{e.stopPropagation();if(a.completed)return;a.locked=!a.locked;render()};
-  let del=document.createElement("button");del.className="icon danger audio-delete";del.textContent="×";del.title="Delete";del.disabled=a.locked&&!a.completed;del.onclick=e=>{e.stopPropagation();if(a.locked&&!a.completed)return;if(confirm(`Delete article "${a.title}"?`)){state.articles=state.articles.filter(x=>x.id!==a.id);render()}};
+  let del=document.createElement("button");del.className="icon danger audio-delete";del.textContent=a.completed?"↺":"×";del.title=a.completed?"Restore":"Kill";del.setAttribute("aria-label",del.title);del.onclick=e=>{e.stopPropagation();a.completed?restoreArticle(a):killArticle(a)};
   head.append(h,title,m,pin,send,lock,del);
   head.onclick=e=>{if(e.target.closest("button,.handle"))return;a.collapsed=!a.collapsed;render()};
 
@@ -777,8 +777,8 @@ function renderArticles(){
   a.audio.forEach(clip=>audioList.appendChild(makeAudioTile(clip,a.audio,{editable:!a.locked,onChange:()=>{st.textContent=stats(a.text,a.audio);m.textContent=combinedTime(a.text,a.audio);audioTitle.textContent=`Audio (${a.audio.length})`;saveCurrent()}})));
   audioSection.appendChild(audioList);body.insertBefore(audioSection,body.querySelector(".bottom-row"));
 
-  complete.textContent=a.completed?"Restore":"Kill";
-  complete.onclick=()=>a.completed?restoreArticle(a):killArticle(a);
+  complete.textContent="Delete";
+  complete.onclick=()=>{if(confirm(`Delete article "${a.title}"?`)){state.articles=state.articles.filter(x=>x.id!==a.id);render()}};
 
   c.append(head,body);stack.appendChild(c);
  });
