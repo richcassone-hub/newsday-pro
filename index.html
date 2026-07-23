@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Newsday Pro v1.28</title>
+<title>Newsday Pro v1.34</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect x=%272%27 y=%272%27 width=%2760%27 height=%2760%27 rx=%2714%27 fill=%27%23132033%27 stroke=%27%2336506f%27 stroke-width=%274%27/%3E%3Crect x=%2714%27 y=%2715%27 width=%2736%27 height=%275%27 rx=%272.5%27 fill=%27%234ea1ff%27/%3E%3Crect x=%2714%27 y=%2729%27 width=%2736%27 height=%275%27 rx=%272.5%27 fill=%27%23d7e4f3%27/%3E%3Crect x=%2714%27 y=%2743%27 width=%2728%27 height=%275%27 rx=%272.5%27 fill=%27%238193a7%27/%3E%3Ccircle cx=%2751%27 cy=%2749%27 r=%275%27 fill=%27%23ff6670%27/%3E%3C/svg%3E">
 <style>
 :root{
@@ -149,19 +149,67 @@ label{display:block;font-size:calc(var(--content-size) * .72);color:var(--muted)
 .pin-divider{height:1px;background:var(--line);margin:2px 0 7px}
 .mic-select-wrap{display:flex;align-items:center;gap:5px;white-space:nowrap}.mic-select{max-width:190px;height:27px;padding:3px 24px 3px 7px;border:1px solid var(--line);background:#0e141d;color:var(--text);border-radius:7px;font-size:11px}
 @media(max-width:900px){.app{min-width:720px}.topbar{flex-wrap:nowrap;overflow-x:auto}.newsday-name{min-width:130px}.pane{min-width:330px}}
+
+.search-wrap{position:relative;display:flex;align-items:center;flex:0 1 390px;min-width:180px}.global-search{width:100%;height:29px;padding:4px 30px 4px 10px;border:1px solid var(--line);background:#0e141d;color:var(--text);border-radius:7px;font-size:12px}.search-clear{position:absolute;right:4px;border:0;background:transparent;color:var(--muted);font-size:16px;padding:2px 6px;display:none}.search-wrap.active .search-clear{display:block}.settings-grid{display:grid;grid-template-columns:auto minmax(180px,1fr);gap:12px 14px;align-items:center}.settings-grid label{margin:0}.settings-grid input,.settings-grid select{width:100%;max-width:none}.search-hidden{display:none!important}
+
+.global-search::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;display:none}
+
+
+.settings-compact{width:min(360px,92vw)}
+.settings-grid{grid-template-columns:110px minmax(0,1fr);gap:10px 12px}
+.settings-grid .wpm-combo{display:flex;align-items:center;gap:6px}
+.settings-grid .wpm-combo input{min-width:0}
+.settings-grid .wpm-unit{font-size:11px;color:var(--muted);white-space:nowrap}
+
+
+#saveAsBtn{white-space:nowrap;flex:0 0 auto}
+.settings-compact{width:min(320px,92vw);padding:10px}
+.settings-top{display:flex;align-items:center;margin-bottom:10px}
+.settings-top h3{flex:1;margin:0;font-size:16px}
+.settings-close{width:27px;height:27px;padding:0;font-size:17px;display:grid;place-items:center}
+.settings-field{margin-top:10px}
+.settings-field>label{margin:0 0 5px;font-size:11px}
+.settings-wpm-row{display:grid;grid-template-columns:1fr 34px auto;gap:5px;align-items:center}
+.settings-wpm-row input{height:31px}
+.wpm-menu-btn{height:31px;padding:0;display:grid;place-items:center}
+.wpm-unit{font-size:11px;color:var(--muted);white-space:nowrap}
+.wpm-picker{position:relative}
+.wpm-menu{position:absolute;z-index:400;right:0;top:35px;width:96px;max-height:220px;overflow:auto;background:#111822;border:1px solid var(--line);border-radius:8px;padding:4px;box-shadow:0 12px 28px rgba(0,0,0,.45);display:none}
+.wpm-menu.open{display:block}
+.wpm-menu button{display:block;width:100%;text-align:left;border:0;border-radius:5px;padding:6px 8px;line-height:1.1}
+.settings-field .mic-select{width:100%;max-width:none;height:31px}
+
+
+.settings-compact{width:min(340px,92vw);padding:12px}
+.settings-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.settings-top h3{flex:1;margin:0;font-size:16px}
+.settings-field{margin-top:11px}
+.settings-field>label{margin:0 0 5px;font-size:11px}
+.wpm-combo{position:relative;display:flex;align-items:center}
+.wpm-combo input{width:100%;height:31px;padding-right:34px}
+.wpm-combo-toggle{position:absolute;right:1px;top:1px;bottom:1px;width:31px;border:0;border-left:1px solid var(--line);border-radius:0 7px 7px 0;background:transparent;padding:0;display:grid;place-items:center;color:var(--muted)}
+.wpm-combo-toggle:hover{background:var(--panel2);color:var(--text)}
+.wpm-menu{position:absolute;z-index:400;left:0;right:0;top:35px;max-height:300px;overflow:auto;background:#111822;border:1px solid var(--line);border-radius:8px;padding:4px;box-shadow:0 12px 28px rgba(0,0,0,.45);display:none}
+.wpm-menu.open{display:block}
+.wpm-menu button{display:block;width:100%;text-align:left;border:0;border-radius:5px;padding:6px 9px;line-height:1.15}
+.wpm-unit-line{display:flex;align-items:center;gap:7px}
+.wpm-unit-line .wpm-combo{flex:1;min-width:0}
+.wpm-unit{font-size:11px;color:var(--muted);white-space:nowrap}
+.settings-field .mic-select{width:100%;max-width:none;height:31px}
+
 </style>
 </head>
 <body>
 <div class="app">
 <header class="topbar">
-  <div class="brand"><span class="logo"></span><strong>Newsday Pro <span class="version">v1.28</span></strong></div>
+  <div class="brand"><span class="logo"></span><strong>Newsday Pro <span class="version">v1.34</span></strong></div>
   <input id="newsdayName" class="newsday-name" aria-label="Newsday name">
   <button id="newBtn">New</button><button id="saveBtn" class="primary">Save</button><button id="saveAsBtn">Save As</button>
   <button id="loadBtn">Load</button><button id="exportBtn">Export</button><button id="importBtn">Import</button>
   <input id="importFile" type="file" accept=".newsday,.json,application/json" hidden>
   <span class="spacer"></span>
-  <span class="compact-label">Text</span><button id="fontMinus" class="icon" title="Smaller text">−</button><button id="fontPlus" class="icon" title="Larger text">+</button>
-  <span class="compact-label">WPM</span><input id="wpm" class="wpm" type="number" min="30" max="800"><span class="mic-select-wrap"><span class="compact-label">Mic</span><select id="microphoneSelect" class="mic-select" title="Recording microphone"><option value="">Default microphone</option></select></span><button id="swapPanes" class="icon" title="Swap panes" aria-label="Swap panes">⇄</button><button id="fullscreenBtn" class="icon" title="Fullscreen" aria-label="Fullscreen">↕</button>
+  <div class="search-wrap" id="searchWrap"><input id="globalSearch" class="global-search" type="search" placeholder="Search Newsday…" autocomplete="off" aria-label="Search Newsday"><button id="searchClear" class="search-clear" title="Clear search" aria-label="Clear search">×</button></div>
+  <button id="settingsBtn" class="icon" title="Settings" aria-label="Settings">⚙</button><button id="swapPanes" class="icon" title="Swap panes" aria-label="Swap panes">⇄</button><button id="fullscreenBtn" class="icon" title="Fullscreen" aria-label="Fullscreen">↕</button>
 </header>
 
 <main class="workspace">
@@ -179,6 +227,7 @@ label{display:block;font-size:calc(var(--content-size) * .72);color:var(--muted)
 </main>
 </div>
 
+<div id="settingsModal" class="modal-bg"><div class="modal settings-compact"><div class="settings-top"><h3>Settings</h3><button id="settingsClose">Close</button></div><div class="settings-field"><label for="wpm">Reading speed</label><div class="wpm-unit-line"><div class="wpm-combo"><input id="wpm" class="wpm" type="text" inputmode="numeric" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="wpmMenu"><button id="wpmMenuBtn" class="wpm-combo-toggle" type="button" title="Choose WPM" aria-label="Choose WPM">▾</button><div id="wpmMenu" class="wpm-menu" role="listbox"></div></div><span class="wpm-unit">WPM</span></div></div><div class="settings-field"><label for="microphoneSelect">Microphone</label><select id="microphoneSelect" class="mic-select" title="Recording microphone"><option value="">Default microphone</option></select></div></div></div>
 <div id="loadModal" class="modal-bg"><div class="modal"><div class="row"><h3 style="flex:1">Load Newsday</h3><button id="closeLoad">Close</button></div><div id="savedList" class="saved"></div></div></div>
 <div id="aboutModal" class="modal-bg">
   <div class="modal" style="width:min(430px,92vw)">
@@ -445,13 +494,22 @@ function nextCastName(){
 }
 function newCast(){return{id:uuid(),name:nextCastName(),collapsed:false,editing:false,locked:false,completed:false,lockout:"",items:[]}}
 function newState(){return{id:uuid(),name:today(),wpm:180,fontSize:16,articles:[],newscasts:[],activeNewscastId:null,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()}}
+function ensureValidActiveNewscast(preferredId=null){
+ const preferred=preferredId&&state.newscasts.find(n=>n.id===preferredId&&!n.completed);
+ if(preferred){state.activeNewscastId=preferred.id;return preferred}
+ const current=state.newscasts.find(n=>n.id===state.activeNewscastId&&!n.completed);
+ if(current)return current;
+ const next=state.newscasts.find(n=>!n.completed)||null;
+ state.activeNewscastId=next?.id||null;
+ return next;
+}
 function normalize(x){
  const s=newState();
  if(!x||typeof x!=="object")return s;
  s.id=x.id||uuid();s.name=(x.name||today()).trim()||today();s.wpm=clamp(+x.wpm||180,30,800);s.fontSize=clamp(+x.fontSize||16,11,28);
  s.articles=Array.isArray(x.articles)?x.articles.map(a=>({id:a.id||uuid(),title:(a.title||"Untitled Article").trim()||"Untitled Article",url:a.url||"",text:a.text||"",collapsed:!!a.collapsed,locked:!!a.locked||!!a.completed,completed:!!a.completed,pinned:!!a.pinned,audio:Array.isArray(a.audio)?a.audio.map(normalizeAudio):[]})):[];
  s.newscasts=Array.isArray(x.newscasts)?x.newscasts.map((n,i)=>({id:n.id||uuid(),name:(n.name||`Newscast ${i+1}`).trim()||`Newscast ${i+1}`,collapsed:!!n.collapsed,editing:false,locked:!!n.locked||!!n.completed,completed:!!n.completed,lockout:n.lockout||"",items:Array.isArray(n.items)?n.items.map(it=>({id:it.id||uuid(),sourceArticleId:it.sourceArticleId||null,title:(it.title||"Untitled Article").trim()||"Untitled Article",text:it.text||"",audio:Array.isArray(it.audio)?it.audio.map(normalizeAudio):[],editing:false})):[]})):[];
- s.activeNewscastId=x.activeNewscastId&&s.newscasts.some(n=>n.id===x.activeNewscastId)?x.activeNewscastId:(s.newscasts[0]?.id||null);
+ s.activeNewscastId=x.activeNewscastId&&s.newscasts.some(n=>n.id===x.activeNewscastId&&!n.completed)?x.activeNewscastId:(s.newscasts.find(n=>!n.completed)?.id||null);
  const open=s.newscasts.find(n=>!n.collapsed);
  s.newscasts.forEach(n=>n.collapsed=open?n.id!==open.id:true);
  s.createdAt=x.createdAt||new Date().toISOString();s.updatedAt=new Date().toISOString();return s;
@@ -476,6 +534,7 @@ function setFont(n){state.fontSize=clamp(n,11,28);document.documentElement.style
 function safeUrl(v){v=String(v||"").trim();if(!v)return null;try{let u=new URL(/^[a-z]+:/i.test(v)?v:"https://"+v);return /^https?:$/.test(u.protocol)?u.href:null}catch{return null}}
 
 let state=(()=>{try{return normalize(JSON.parse(localStorage.getItem(CURRENT)||"null"))}catch{return newState()}})();
+
 document.documentElement.style.setProperty("--story-size",state.fontSize+"px");
 
 
@@ -503,6 +562,12 @@ if($("microphoneSelect")){
  // Otherwise only Default/generic entries are shown until the first Record permission grant.
  refreshMicrophoneList();
 }
+let searchQuery="";
+let searchWasActive=false;
+function searchTerms(){return searchQuery.trim().toLowerCase()}
+function articleMatchesSearch(a,q){if(!q)return true;return [a.title,a.text,a.url,...(a.audio||[]).map(x=>x.name)].some(v=>String(v||"").toLowerCase().includes(q))}
+function castMatchesSearch(nc,q){if(!q)return true;const vals=[nc.name,nc.lockout];(nc.items||[]).forEach(it=>{vals.push(it.title,it.text,...(it.audio||[]).map(x=>x.name))});return vals.some(v=>String(v||"").toLowerCase().includes(q))}
+function searchActive(){return !!searchTerms()}
 function render(){
  $("newsdayName").value=state.name;$("wpm").value=state.wpm;
  renderArticles();renderCasts();saveCurrent();
@@ -510,8 +575,8 @@ function render(){
 function makeHandle(type,id,parentId=null){
  let h=document.createElement("div");h.className="handle";h.textContent="⋮⋮";h.title="Drag";
  const article=type==="article"?state.articles.find(a=>a.id===id):null;
- const blocked=(type==="cast-item"&&state.newscasts.find(n=>n.id===parentId)?.locked);
- if(blocked){h.style.opacity=".35";h.style.cursor="default";h.title="Newscast locked";}
+ const blocked=searchActive()||(type==="cast-item"&&state.newscasts.find(n=>n.id===parentId)?.locked);
+ if(blocked){h.style.opacity=".35";h.style.cursor="default";h.title=searchActive()?"Reordering disabled while searching":"Newscast locked";}
  h.addEventListener("click",e=>e.stopPropagation());
  h.addEventListener("pointerdown",e=>{if(!blocked)beginPointerDrag(e,type,id,parentId,h.closest(".card,.cast-item"))});
  return h;
@@ -681,6 +746,22 @@ function insertArticleCopy(nc,a,beforeId=null){
  state.newscasts.forEach(x=>x.collapsed=x.id!==nc.id);
  requestAnimationFrame(()=>document.querySelector(`[data-item-id="${item.id}"]`)?.classList.add("flash"));
 }
+
+function insertCastItemCopy(nc,it){
+ if(!nc||nc.locked||nc.completed||!it)return;
+ const item={
+   id:uuid(),
+   sourceArticleId:it.sourceArticleId||null,
+   title:it.title||"Untitled Article",
+   text:it.text||"",
+   audio:clone(it.audio||[]),
+   editing:false
+ };
+ nc.items.push(item);
+ saveCurrent();
+ requestAnimationFrame(()=>document.querySelector(`[data-item-id="${item.id}"]`)?.classList.add("flash"));
+ toast(`Sent to ${nc.name}`);
+}
 function insertNewRegularArticleAtTop(a){
  let insertAt=0;
  while(insertAt<state.articles.length && state.articles[insertAt].pinned && !state.articles[insertAt].completed)insertAt++;
@@ -702,12 +783,17 @@ function restoreArticle(a){
  a.completed=false;a.locked=false;a.collapsed=true;moveItemToTop(state.articles,a.id);render();
 }
 function completeNewscast(nc){
+ const wasActive=state.activeNewscastId===nc.id;
  nc.completed=true;nc.locked=true;nc.collapsed=true;nc.editing=false;nc.items.forEach(x=>x.editing=false);
- moveItemToEnd(state.newscasts,nc.id);render();
+ moveItemToEnd(state.newscasts,nc.id);
+ if(wasActive)ensureValidActiveNewscast();
+ render();
 }
 function restoreNewscast(nc){
  nc.completed=false;nc.locked=false;nc.collapsed=true;nc.editing=false;nc.items.forEach(x=>x.editing=false);
- moveItemToTop(state.newscasts,nc.id);render();
+ moveItemToTop(state.newscasts,nc.id);
+ ensureValidActiveNewscast();
+ render();
 }
 function setArticlePinnedByIcon(a){
  if(a.completed)return;
@@ -728,13 +814,15 @@ function setArticlePinnedByIcon(a){
  render();
 }
 function renderArticles(){
- $("articleHeading").textContent=`Articles (${state.articles.length})`;
+ const q=searchTerms();const visibleArticles=state.articles.filter(a=>articleMatchesSearch(a,q));
+ $("articleHeading").textContent=`Articles (${q?visibleArticles.length+"/":""}${state.articles.length})`;
  let stack=$("articleStack");stack.innerHTML="";
  if(!state.articles.length){stack.innerHTML='<div class="empty">No articles yet.</div>';return}
- const active=[...state.articles.filter(a=>a.pinned&&!a.completed),...state.articles.filter(a=>!a.pinned&&!a.completed)];
- const ordered=[...active,...state.articles.filter(a=>a.completed)];
- const label=document.createElement("div");label.className="pin-section-label";label.textContent="Pinned";stack.appendChild(label);
- if(!active.some(a=>a.pinned)){const dz=document.createElement("div");dz.className="pin-drop-empty";dz.dataset.pinDrop="empty";dz.textContent="Drag articles here to pin";stack.appendChild(dz)}
+ if(q&&!visibleArticles.length){stack.innerHTML='<div class="empty">No matching articles.</div>';return}
+ const active=[...visibleArticles.filter(a=>a.pinned&&!a.completed),...visibleArticles.filter(a=>!a.pinned&&!a.completed)];
+ const ordered=[...active,...visibleArticles.filter(a=>a.completed)];
+ if(!q||active.some(a=>a.pinned)){const label=document.createElement("div");label.className="pin-section-label";label.textContent="Pinned";stack.appendChild(label);}
+ if(!q&&!active.some(a=>a.pinned)){const dz=document.createElement("div");dz.className="pin-drop-empty";dz.dataset.pinDrop="empty";dz.textContent="Drag articles here to pin";stack.appendChild(dz)}
  let dividerInserted=false,killLabelInserted=false;
  ordered.forEach((a)=>{
   if(!a.completed&&!a.pinned&&!dividerInserted){const div=document.createElement("div");div.className="pin-divider";div.dataset.pinDivider="true";stack.appendChild(div);dividerInserted=true}
@@ -809,17 +897,28 @@ const ICON_DUPLICATE=`<svg viewBox="0 0 24 24" width="14" height="14" aria-hidde
 const ICON_PENCIL=`<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M4 16.5V20h3.5L18.8 8.7l-3.5-3.5L4 16.5Zm16.7-10.6a1 1 0 0 0 0-1.4l-1.2-1.2a1 1 0 0 0-1.4 0l-1.4 1.4 3.5 3.5 1.5-1.3Z"/></svg>`;
 const ICON_CHECK=`<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/></svg>`;
 function renderCasts(){
- $("castHeading").textContent=`Newscasts (${state.newscasts.length})`;
+ const q=searchTerms();
+ const activeNc=q?state.newscasts.find(n=>n.id===state.activeNewscastId&&!n.completed):null;
+ const matched=state.newscasts.filter(n=>castMatchesSearch(n,q));
+ const visibleCasts=q
+   ? [ ...(activeNc?[activeNc]:[]), ...matched.filter(n=>n.id!==activeNc?.id) ]
+   : matched;
+ $("castHeading").textContent=`Newscasts (${q?matched.length+"/":""}${state.newscasts.length})`;
  let stack=$("castStack");stack.innerHTML="";
  if(!state.newscasts.length){stack.innerHTML='<div class="empty">No newscasts yet.</div>';return}
- const ordered=[...state.newscasts.filter(n=>!n.completed),...state.newscasts.filter(n=>n.completed)];
+ if(q&&!visibleCasts.length){stack.innerHTML='<div class="empty">No matching newscasts.</div>';return}
+ const ordered=q
+   ? [ ...(activeNc?[activeNc]:[]),
+       ...visibleCasts.filter(n=>n.id!==activeNc?.id&&!n.completed),
+       ...visibleCasts.filter(n=>n.id!==activeNc?.id&&n.completed) ]
+   : [...visibleCasts.filter(n=>!n.completed),...visibleCasts.filter(n=>n.completed)];
  let completedHeaderInserted=false;
  ordered.forEach((nc)=>{
   if(nc.completed&&!completedHeaderInserted){
     const label=document.createElement("div");label.className="pin-section-label";label.textContent="Completed";label.dataset.completedCastHeader="true";stack.appendChild(label);completedHeaderInserted=true;
   }
   let c=document.createElement("section");c.className="card "+(nc.collapsed?"collapsed ":"")+(state.activeNewscastId===nc.id?"active ":"")+(nc.locked?"locked ":"")+(nc.completed?"completed":"");c.dataset.castId=nc.id;
-  c.onclick=()=>{state.activeNewscastId=nc.id;saveCurrent();document.querySelectorAll("[data-cast-id]").forEach(x=>x.classList.toggle("active",x.dataset.castId===nc.id));document.querySelectorAll(".send").forEach(b=>b.disabled=false)};
+  c.onclick=()=>{if(searchActive()||nc.completed)return;state.activeNewscastId=nc.id;saveCurrent();document.querySelectorAll("[data-cast-id]").forEach(x=>x.classList.toggle("active",x.dataset.castId===nc.id));document.querySelectorAll(".send").forEach(b=>b.disabled=!state.activeNewscastId)};
   let head=document.createElement("div");head.className="card-head";
   let h=makeHandle("newscast",nc.id),name=document.createElement("div");name.className="title"+(castAudioSeconds(nc)>0?" has-audio":"");name.textContent=nc.name;
   let meta=document.createElement("div");meta.className="newscast-total";let updateMeta=()=>{meta.textContent=castDurationText(nc)};updateMeta();
@@ -835,7 +934,7 @@ function renderCasts(){
     e.stopPropagation();
     if(nc.locked)return;
     state.newscasts.forEach(x=>{if(x.id!==nc.id){x.collapsed=true;x.editing=false;x.items.forEach(y=>y.editing=false)}});
-    nc.collapsed=false;state.activeNewscastId=nc.id;nc.editing=!nc.editing;
+    nc.collapsed=false;if(!searchActive()&&!nc.completed)state.activeNewscastId=nc.id;nc.editing=!nc.editing;
     if(!nc.editing)nc.name=nc.name.trim()||"Newscast";
     render();
   };
@@ -846,8 +945,12 @@ function renderCasts(){
   head.onclick=e=>{
     if(e.target.closest("button,.handle"))return;
     if(nc.collapsed){
-      state.newscasts.forEach(x=>{if(x.id!==nc.id){x.collapsed=true;x.editing=false;x.items.forEach(y=>y.editing=false)}});
-      nc.collapsed=false;state.activeNewscastId=nc.id;
+      if(searchActive()){
+        nc.collapsed=false;
+      }else{
+        state.newscasts.forEach(x=>{if(x.id!==nc.id){x.collapsed=true;x.editing=false;x.items.forEach(y=>y.editing=false)}});
+        nc.collapsed=false;if(!nc.completed)state.activeNewscastId=nc.id;
+      }
     }else{
       nc.collapsed=true;nc.editing=false;nc.items.forEach(x=>x.editing=false);
     }
@@ -874,7 +977,19 @@ function renderCasts(){
     let hh=makeHandle("cast-item",it.id,nc.id),tt=document.createElement("div");tt.className="title"+(it.audio?.length?" has-audio":"");tt.textContent=it.title,im=document.createElement("div");im.className="meta";im.textContent=combinedTime(it.text,it.audio);
     let eb=document.createElement("button");eb.className="icon";eb.innerHTML=it.editing?ICON_CHECK:ICON_PENCIL;eb.title=it.editing?"Finish editing":"Edit";eb.setAttribute("aria-label",eb.title);eb.disabled=nc.locked;eb.onclick=e=>{e.stopPropagation();if(nc.locked)return;it.editing=!it.editing;render()};
     let db=document.createElement("button");db.className="icon danger";db.textContent="×";db.disabled=nc.locked;db.onclick=e=>{e.stopPropagation();if(nc.locked)return;if(confirm(`Delete "${it.title}" from this newscast?`)){nc.items=nc.items.filter(x=>x.id!==it.id);render()}};
-    ih.append(hh,tt,im,eb,db);
+    ih.append(hh,tt,im);
+    if(searchActive()&&nc.id!==state.activeNewscastId){
+      const target=state.newscasts.find(n=>n.id===state.activeNewscastId&&!n.completed);
+      let sendToActive=document.createElement("button");
+      sendToActive.className="icon";
+      sendToActive.textContent="→";
+      sendToActive.title=target?`Send to ${target.name}`:"No active newscast";
+      sendToActive.setAttribute("aria-label",sendToActive.title);
+      sendToActive.disabled=!target||target.locked;
+      sendToActive.onclick=e=>{e.stopPropagation();if(!target||target.locked)return;insertCastItemCopy(target,it);render()};
+      ih.append(sendToActive);
+    }
+    ih.append(eb,db);
     let ib=document.createElement("div");ib.className="cast-item-body";
     if(it.editing&&!nc.locked){
       let ta=document.createElement("textarea");ta.value=it.text;ta.oninput=()=>{it.text=ta.value;afterNativeEdit(ta,()=>{im.textContent=combinedTime(it.text,it.audio);updateMeta();total.textContent=totalText(nc);autoHeight(ta);saveCurrent()})};ib.appendChild(ta);requestAnimationFrame(()=>autoHeight(ta));
@@ -1034,7 +1149,7 @@ updateCastTimer();
 updateCastTarget();
 updateTransportUi();
 
-$("addArticle").onclick=()=>{
+$("addArticle").onclick=()=>{if(searchActive())return;
  const a=newArticle();insertNewRegularArticleAtTop(a);render();
  requestAnimationFrame(()=>{
    const card=document.querySelector(`[data-article-id="${a.id}"]`);
@@ -1043,14 +1158,68 @@ $("addArticle").onclick=()=>{
    if(title&&!title.disabled){title.focus({preventScroll:true});title.select()}
  });
 };
-$("addCast").onclick=()=>{state.newscasts.forEach(x=>{x.collapsed=true;x.editing=false;x.items.forEach(y=>y.editing=false)});let n=newCast();state.newscasts.unshift(n);state.activeNewscastId=n.id;render()};
+$("addCast").onclick=()=>{if(searchActive())return;state.newscasts.forEach(x=>{x.collapsed=true;x.editing=false;x.items.forEach(y=>y.editing=false)});let n=newCast();state.newscasts.unshift(n);state.activeNewscastId=n.id;render()};
 $("collapseAll").onclick=()=>{state.articles.forEach(a=>a.collapsed=true);render()};
 $("expandAll").onclick=()=>{state.articles.forEach(a=>a.collapsed=false);render()};
-$("fontMinus").onclick=()=>setFont(state.fontSize-1);
-$("fontPlus").onclick=()=>setFont(state.fontSize+1);
+function updateSearchModeUi(){
+ const active=searchActive();
+ $("addArticle").disabled=active;
+ $("addCast").disabled=active;
+}
+$("globalSearch").oninput=e=>{
+  const wasActive=searchActive();
+  searchQuery=e.target.value;
+  const isActive=searchActive();
+  $("searchWrap").classList.toggle("active",!!searchQuery);
+  if(!wasActive&&isActive){
+    const active=state.newscasts.find(n=>n.id===state.activeNewscastId);
+    if(active){active.collapsed=true;active.editing=false;active.items.forEach(x=>x.editing=false)}
+  }
+  updateSearchModeUi();
+  renderArticles();renderCasts()
+};
+function clearSearch({focus=false}={}){
+  searchQuery="";
+  $("globalSearch").value="";
+  $("searchWrap").classList.remove("active");
+  updateSearchModeUi();
+  renderArticles();renderCasts();
+  if(focus)$("globalSearch").focus()
+}
+$("searchClear").onclick=()=>clearSearch({focus:true});
+
+function commitWpm(){
+ const raw=String($("wpm").value||"").trim();
+ const n=Number(raw);
+ if(!Number.isFinite(n)){ $("wpm").value=state.wpm; return; }
+ state.wpm=clamp(n,30,800);
+ $("wpm").value=state.wpm;
+ saveCurrent();
+ renderArticles();renderCasts();
+}
+$("wpm").onchange=commitWpm;
+$("wpm").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();commitWpm();$("wpm").blur()}};
+const wpmMenu=$("wpmMenu");
+function setWpmMenu(open){
+ wpmMenu.classList.toggle("open",open);
+ $("wpm").setAttribute("aria-expanded",open?"true":"false");
+}
+for(let n=150;n<=250;n+=5){
+ const b=document.createElement("button");
+ b.type="button";
+ b.textContent=String(n);
+ b.setAttribute("role","option");
+ b.onclick=e=>{e.stopPropagation();$("wpm").value=String(n);commitWpm();setWpmMenu(false);$("wpm").focus()};
+ wpmMenu.appendChild(b);
+}
+$("wpmMenuBtn").onclick=e=>{e.stopPropagation();setWpmMenu(!wpmMenu.classList.contains("open"))};
+$("wpm").onfocus=()=>{};
+document.addEventListener("click",e=>{if(!e.target.closest(".wpm-combo"))setWpmMenu(false)});
+$("settingsBtn").onclick=()=>{$("wpm").value=state.wpm;setWpmMenu(false);$("settingsModal").classList.add("open");refreshMicrophoneList()};
+$("settingsClose").onclick=()=>{setWpmMenu(false);$("settingsModal").classList.remove("open")};
+$("settingsModal").onclick=e=>{if(e.target===$("settingsModal")){setWpmMenu(false);$("settingsModal").classList.remove("open")}};
 $("newsdayName").oninput=e=>{state.name=e.target.value;afterNativeEdit(e.target,saveCurrent)};
 $("newsdayName").onblur=e=>{state.name=e.target.value.trim()||today();e.target.value=state.name;saveCurrent()};
-$("wpm").onchange=e=>{state.wpm=clamp(+e.target.value||180,30,800);render()};
 $("newBtn").onclick=()=>{if(confirm("Create a new Newsday? Unsaved current work will be replaced.")){state=newState();setFont(16);render()}};
 $("saveBtn").onclick=()=>{state.name=$("newsdayName").value.trim()||today();let m=library();m[state.id]=clone(state);saveLibrary(m);saveCurrent();toast("Saved")};
 $("saveAsBtn").onclick=()=>{let n=prompt("Save Newsday as:",state.name);if(n===null)return;n=n.trim()||today();state.id=uuid();state.name=n;let m=library();m[state.id]=clone(state);saveLibrary(m);render();toast(`Saved as ${n}`)};
@@ -1137,6 +1306,19 @@ splitter.onpointerdown=e=>{
    if(currentLeft===ap)localStorage.setItem(WIDTH,currentLeft.getBoundingClientRect().width);
  };
 };
+
+document.addEventListener("keydown",e=>{
+ if(e.key!=="Escape"||!searchActive())return;
+ if(document.querySelector(".modal-bg.open"))return;
+ e.preventDefault();
+ e.stopPropagation();
+ clearSearch();
+},true);
+
+updateSearchModeUi();
+
+ensureValidActiveNewscast();
+
 render();
 </script>
 </body>
